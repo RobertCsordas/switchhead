@@ -19,7 +19,7 @@ class SwitchHeadSelfAttention(torch.nn.Module):
     def __init__(self, d_model: int, *args, attention_core=switchhead.SwitchHeadRope, **kwargs):
         super().__init__()
         self.norm = torch.nn.LayerNorm(d_model)
-        self.attention = attention_core(d_model,  *args, **kwargs).cuda()
+        self.attention = attention_core(d_model,  *args, **kwargs)
 
     def forward(self, x: torch.Tensor, mask: Optional[switchhead.AttentionMask] = None, kv_cache: switchhead.KVCache = None) -> Tuple[torch.Tensor, switchhead.KVCache]:
         xn = self.norm(x)
