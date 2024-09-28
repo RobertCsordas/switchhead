@@ -1,10 +1,12 @@
 # SwitchHead: Accelerating Transformers with Mixture-of-Experts Attention
 
-Official implementation of our [SwitchHead](https://arxiv.org/abs/2312.07987) model from our NeurIPS 2024 paper.
+![switchhead](https://robertcsordas.github.io/images/moeatt_simple.svg)
 
-The implementation uses the [CVMM Triton kernel](https://github.com/RobertCsordas/moe_layer/blob/master/triton_src/moe_layer/cvmm.py) from $\sigma$-MoE.
+Official implementation of the [SwitchHead](https://arxiv.org/abs/2312.07987) attention from our NeurIPS 2024 paper.
 
-For the training code, please refer to [https://github.com/robertcsordas/moe_attention](https://github.com/robertcsordas/moe_attention).
+This repository is an user-friendly implementation of SwitchHead. For the training code, please refer to [https://github.com/robertcsordas/moe_attention](https://github.com/robertcsordas/moe_attention).
+
+This implementation relies on the [CVMM Triton kernel](https://github.com/RobertCsordas/moe_layer/blob/master/triton_src/moe_layer/cvmm.py) from $\sigma$-MoE.
 
 ## Example
 
@@ -16,10 +18,10 @@ import math
 from typing import Tuple, Optional
 
 class SwitchHeadSelfAttention(torch.nn.Module):
-    def __init__(self, d_model: int, *args, attention_core=switchhead.SwitchHeadRope, **kwargs):
+    def __init__(self, d_model: int, *args, **kwargs):
         super().__init__()
         self.norm = torch.nn.LayerNorm(d_model)
-        self.attention = attention_core(d_model,  *args, **kwargs)
+        self.attention = switchhead.SwitchHeadRope(d_model,  *args, **kwargs)
 
     def forward(self, x: torch.Tensor, mask: Optional[switchhead.AttentionMask] = None, kv_cache: switchhead.KVCache = None) -> Tuple[torch.Tensor, switchhead.KVCache]:
         xn = self.norm(x)
@@ -104,6 +106,14 @@ torch.compile() is supported with PyTorch >= 2.3.
 ├───example.py - an example forward using both variants pass.
 ├───LICENSE - MIT License.
 └───README.md - this documentation.
+```
+
+## Installation Instruction
+
+The only external dependencies are PyTorch (>= 2.1) and Triton (>= 2.1). Copy the `switchhead` directory to your project and import it as shown in the examples above.
+
+```bash
+pip3 install -r requirements.txt
 ```
 
 ## Known issues
